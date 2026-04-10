@@ -1,16 +1,44 @@
-# React + Vite
+# ⚽ Proyecto Gestión de Canchas
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+¡Bienvenidos! Este es el frontend del proyecto integrador desarrollado con **React + Vite + Tailwind CSS**.
 
-Currently, two official plugins are available:
+📂 Guía de Git para el Equipo **!!IMPORTANTE LEER¡¡**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Para mantener el proyecto sincronizado sin errores, sigan este orden siempre que vayan a trabajar:
 
-## React Compiler
+1. Antes de empezar a programar (Actualizar)
+Siempre bajen los cambios que sus compañeros hayan subido para no trabajar sobre código viejo.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+`git pull`: Trae los cambios más recientes del repositorio remoto a tu PC.
 
-## Expanding the ESLint configuration
+2. Al terminar un avance (Guardar y Subir)
+Cuando termines una funcionalidad o un componente (por ejemplo, el Navbar.jsx), sigue estos pasos:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Paso A: `git add -A`
+
+(Prepara todos tus archivos nuevos o modificados para el envío).
+
+Paso B: `git commit -m "Descripción breve de lo que hiciste"`
+
+(Le pone una etiqueta a tu avance. Ejemplo: "Agregado componente de Login").
+
+Paso C: `git push`
+
+
+## 🚀 Comandos Rápidos
+- **Instalar dependencias:** `npm install`
+- **Correr el proyecto:** `npm run dev`
+- **Construir para producción:** `npm run build`
+- **Detener terminal:** `ctrl + c`
+
+## 📂 Estructura del Proyecto
+- `src/components`: Componentes pequeños (botones, tarjetas, headers o cualquier cosa que se repita en las demas paginas).
+- `src/pages`: Vistas completas (Home, Login, Registro).
+- `src/assets`: Imágenes y logos de las canchas.
+
+## 🎨 Estilos
+Usamos **Tailwind CSS**. No editen el archivo CSS global a menos que sea estrictamente necesario; prefieran usar las clases directas en el HTML.
+
+## 📌 Notas del Equipo
+- Para los iconos, instalaremos `lucide-react` o `react-icons`.
+- Las rutas se manejan en `App.jsx`.
