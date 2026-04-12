@@ -3,7 +3,7 @@ import Navbar from '../components/Navbar'; // Importas la pieza de Lego
 const Home = () => {
   return (
     <div className="bg-slate-900 min-h-screen text-white">
-      <Navbar />
+      <Navbar paginaActiva="inicio"/>
       
       <main>
         {/* Aquí sigue el resto de tu contenido del home */}
