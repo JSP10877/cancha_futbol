@@ -30,6 +30,7 @@ Paso C: `git push`
 - **Correr el proyecto:** `npm run dev`
 - **Construir para producción:** `npm run build`
 - **Detener terminal:** `ctrl + c`
+- **Instalar React Router:** `npm install react-router-dom`
 
 ## 📂 Estructura del Proyecto
 - `src/components`: Componentes pequeños (botones, tarjetas, headers o cualquier cosa que se repita en las demas paginas).
