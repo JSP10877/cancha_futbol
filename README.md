@@ -34,11 +34,11 @@ Paso C: `git push`
 
 ## 📂 Estructura del Proyecto
 - `src/components`: Componentes pequeños (botones, tarjetas, headers o cualquier cosa que se repita en las demas paginas).
-- `src/pages`: Vistas completas (Home, Login, Registro).
-- `src/assets`: Imágenes y logos de las canchas.
+- `src/pages`: Vistas completas (Home, Canchas, Reservar).
+- `src/assets/images`: Imágenes y logos de las canchas.
 
 ## 🎨 Estilos
-Usamos **Tailwind CSS**. No editen el archivo CSS global a menos que sea estrictamente necesario; prefieran usar las clases directas en el HTML.
+Usamos **Tailwind CSS**. No editen el archivo CSS **(NO TOCAR INDEX.CSS)** global a menos que sea estrictamente necesario; prefieran usar las clases directas en el HTML.
 
 ## 📌 Notas del Equipo
 - Para los iconos, instalaremos `lucide-react` o `react-icons`.
