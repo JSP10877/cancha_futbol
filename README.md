@@ -24,6 +24,7 @@ Paso B: `git commit -m "Descripción breve de lo que hiciste"`
 
 Paso C: `git push`
 
+3. Si no está seguro del correcto funcionamiento del codigo **NO SUBIR NADA HASTA CORREGIRLO, ya que no manejamos ramas, un error afecta a todos**
 
 ## 🚀 Comandos Rápidos
 - **Instalar dependencias:** `npm install`
