@@ -1,31 +1,42 @@
-const Navbar = ({ paginaActiva }) => { // <--- Recibe la prop
+import { Link } from 'react-router-dom'; // <--- Importante
 
+const Navbar = ({ paginaActiva }) => {
   return (
-    <nav className="bg-slate-900 border-b border-green-600 sticky top-0 z-50 backdrop-blur-md">
+    
+    <nav className="bg-slate-900 border-b border-green-600 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center p-5">
-        <h1 className="text-2xl font-extrabold text-green-500 tracking-wide">
+        <Link to="/" className="text-2xl font-extrabold text-green-500">
           🌎 Urban Arena
-        </h1>
-
+        </Link>
+        
         <div className="space-x-8 font-semibold">
-          {/* Si paginaActiva es "inicio", ponemos texto verde, si no, blanco con hover */}
-          <a href="/" className={paginaActiva === 'inicio' ? 'text-green-500' : 'hover:text-green-400 transition'}>
+          {/* Cambiamos href por "to" y <a> por <Link> */}
+          <Link 
+            to="/" 
+            className={paginaActiva === 'inicio' ? 'text-green-500' : 'hover:text-green-400'}
+          >
             Inicio
-          </a>
+          </Link>
           
-          <a href="/canchas" className={paginaActiva === 'canchas' ? 'text-green-500' : 'hover:text-green-400 transition'}>
+          <Link 
+            to="/canchas" 
+            className={paginaActiva === 'canchas' ? 'text-green-500' : 'hover:text-green-400'}
+          >
             Canchas
-          </a>
+          </Link>
           
-          <a href="/reservas" className={paginaActiva === 'reservas' ? 'text-green-500' : 'hover:text-green-400 transition'}>
+          <Link 
+            to="/reservas" 
+            className={paginaActiva === 'reservas' ? 'text-green-500' : 'hover:text-green-400'}
+          >
             Reservar
-          </a>
-          
+          </Link>
+
         </div>
       </div>
     </nav>
-
   );
 };
+
 
 export default Navbar;

@@ -9,9 +9,9 @@ const Home = () => {
       
       <main>
         {/* Aquí sigue el resto de tu contenido del home */}
-        <h2 className="text-center text-4xl mt-10">Bienvenido a la cancha</h2>
+        <h2 className="text-center text-4xl mt-10">Bienvenido al inicio</h2>
       </main>
-      
+
     </div>
   );
 };
