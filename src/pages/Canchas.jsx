@@ -1,57 +1,115 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // <--- Añade esto
 import Navbar from '../components/Navbar';
 
 const Canchas = () => {
-  // 1. Estado para guardar las canchas de la DB
   const [listaCanchas, setListaCanchas] = useState([]);
+  // Este estado guarda la cancha que seleccionaste para ver el detalle
+  const [canchaEnDetalle, setCanchaEnDetalle] = useState(null);
+  const navigate = useNavigate(); // <--- Añade esto
 
-  // 2. Función para traer los datos del servidor (puerto 5000)
   useEffect(() => {
     fetch('http://localhost:5000/api/canchas')
       .then((response) => response.json())
       .then((data) => setListaCanchas(data))
-      .catch((error) => console.error('Error cargando canchas:', error));
+      .catch((error) => console.error('Error:', error));
   }, []);
 
   return (
-    <div className="bg-slate-900 min-h-screen text-white">
-      {/* Menú pagina desde components/Navbar */}
+    <div className="bg-slate-900 min-h-screen text-white relative">
       <Navbar paginaActiva="canchas"/>
       
-      <main className="container mx-auto px-4">
-        <h2 className="text-center text-4xl mt-10 mb-8 font-bold">Nuestras Canchas</h2>
+      <main className="container mx-auto px-4 py-10">
+        <h2 className="text-center text-4xl font-bold mb-12 text-green-500">Nuestras Canchas</h2>
         
-        {/* 3. Grid para mostrar las canchas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Grid de Canchas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {listaCanchas.map((cancha) => (
-            <div key={cancha.id} className="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-blue-500 transition-all">
-              <h3 className="text-2xl font-semibold mb-2 text-blue-400">{cancha.nombre}</h3>
-              <p className="text-slate-300 mb-4">{cancha.descripcion}</p>
-              
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-sm font-medium px-2.5 py-0.5 rounded bg-blue-900 text-blue-300">
-                  {cancha.tipo}
-                </span>
-                <span className="text-xl font-bold text-green-400">
-                  ${cancha.precio_por_hora}/hr
-                </span>
-              </div>
-
-              <div className="mt-6">
-                <span className={`flex items-center gap-2 ${cancha.disponible ? 'text-green-500' : 'text-red-500'}`}>
-                  <span className={`w-3 h-3 rounded-full ${cancha.disponible ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                  {cancha.disponible ? 'Disponible ahora' : 'No disponible'}
-                </span>
+            <div key={cancha.id} className="bg-slate-800 rounded-2xl overflow-hidden shadow-2xl border border-slate-700 flex flex-col">
+              <img 
+                src={cancha.imagen_url || "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=500"} 
+                className="h-48 w-full object-cover"
+                alt={cancha.nombre}
+              />
+              <div className="p-6 flex flex-col flex-grow">
+                <h3 className="text-2xl font-bold text-white mb-2">{cancha.nombre}</h3>
+                <p className="text-slate-400 text-sm mb-6 flex-grow line-clamp-2">{cancha.descripcion}</p>
+                
+                <button 
+                  onClick={() => setCanchaEnDetalle(cancha)}
+                  className="w-full bg-green-500 hover:bg-green-600 text-slate-900 font-bold py-3 rounded-xl transition-all cursor-pointer hover:scale-[1.02]"
+                >
+                  Reservar Ahora
+                </button>
               </div>
             </div>
           ))}
         </div>
-
-        {/* Mensaje por si la base de datos está vacía */}
-        {listaCanchas.length === 0 && (
-          <p className="text-center text-slate-500 mt-10">Cargando canchas desde la base de datos...</p>
-        )}
       </main>
+
+      {/* --- ESTE ES EL MINI MENÚ (MODAL) --- */}
+      {canchaEnDetalle && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+          <div className="bg-[#111827] w-full max-w-2xl rounded-3xl overflow-hidden border border-slate-800 animate-in fade-in zoom-in duration-300">
+            
+            {/* Cabecera con Imagen */}
+            <div className="h-48 w-full relative">
+              <img 
+                src={canchaEnDetalle.imagen_url || "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800"} 
+                className="w-full h-full object-cover opacity-60"
+                alt={canchaEnDetalle.nombre}
+              />
+            </div>
+
+            {/* Contenido del Detalle */}
+            <div className="p-8">
+              <h2 className="text-3xl font-bold text-green-500 mb-2">{canchaEnDetalle.nombre}</h2>
+              <p className="text-slate-300 mb-8">{canchaEnDetalle.descripcion}</p>
+
+              {/* Grid de Información Técnica */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                  <p className="text-green-500 font-bold text-sm mb-1">Medidas</p>
+                  <p className="text-white font-medium">25m x 15m</p>
+                </div>
+                <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                  <p className="text-green-500 font-bold text-sm mb-1">Capacidad</p>
+                  <p className="text-white font-medium">10 jugadores</p>
+                </div>
+              </div>
+
+              {/* Servicios */}
+              <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700 mb-8">
+                <p className="text-green-500 font-bold text-sm mb-1">Servicios</p>
+                <p className="text-slate-300 text-sm">
+                  Iluminación LED, vestuarios, balón incluido, marcador, zona de descanso.
+                </p>
+              </div>
+
+              {/* Footer del Modal: Precio y Botones */}
+              <div className="flex justify-between items-center pt-4 border-t border-slate-800">
+                <div className="text-2xl font-bold">
+                  Precio: <span className="text-green-400">${canchaEnDetalle.precio_por_hora} / hora</span>
+                </div>
+                <div className="flex gap-3">
+                  <button 
+                    onClick={() => setCanchaEnDetalle(null)}
+                    className="px-6 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold"
+                  >
+                    Cerrar
+                  </button>
+                  <button 
+                  onClick={() => navigate('/reservas', { state: { canchaId: canchaEnDetalle.id } })}
+                  className="w-full bg-green-500 hover:bg-green-600 text-slate-900 font-bold py-3 rounded-xl transition-all cursor-pointer hover:scale-[1.02] active:scale-95"
+                  >
+                    Reservar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
