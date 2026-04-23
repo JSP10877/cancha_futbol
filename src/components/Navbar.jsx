@@ -9,11 +9,11 @@ const Navbar = ({ paginaActiva }) => {
           🌎 Urban Arena
         </Link>
         
-        <div className="space-x-8 font-semibold">
+        <div className="space-x-8 font-semibold text-white">
           {/* Cambiamos href por "to" y <a> por <Link> */}
           <Link 
             to="/" 
-            className={paginaActiva === 'inicio' ? 'text-green-500' : 'hover:text-green-400'}
+            className={paginaActiva === 'inicio' ? 'text-green-500' : 'hover:text-green-400 '}
           >
             Inicio
           </Link>
