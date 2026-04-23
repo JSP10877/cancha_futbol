@@ -52,7 +52,7 @@ const DetalleCanchaModal = ({ canchaId, onClose }) => {
 const styles = {
   overlay: { position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' },
   modal: { backgroundColor: '#111827', width: '100%', maxWidth: '600px', borderRadius: '16px', overflow: 'hidden', border: '1px solid #374151' },
-  headerImage: { height: '100px', background: 'linear-gradient(to bottom, #4ade80, #166534)', width: '100%' },
+  headerImage: { height: '100px', backgroundImage: "url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=500')", width: '100%' },
   body: { padding: '24px' },
   title: { color: '#10b981', fontSize: '1.8rem', fontWeight: 'bold', marginBottom: '8px' },
   descText: { color: '#9ca3af', fontSize: '0.95rem', marginBottom: '24px' },

@@ -6,7 +6,7 @@ const Navbar = ({ paginaActiva }) => {
     <nav className="bg-slate-900 border-b border-green-600 sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center p-5">
         <Link to="/" className="text-2xl font-extrabold text-green-500">
-          🌎 Urban Arena
+          🌎 Futbol 5
         </Link>
         
         <div className="space-x-8 font-semibold text-white">

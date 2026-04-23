@@ -10,6 +10,8 @@ const Reservar = () => {
       <main>
         {/* Aquí sigue el resto de tu contenido del home */}
         <h2 className="text-center text-4xl mt-10">Bienvenido a la reserva</h2>
+      
+      <Footer/>
       </main>
       
     </div>

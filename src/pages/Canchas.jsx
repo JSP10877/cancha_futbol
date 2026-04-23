@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar'; 
 import DetalleCanchaModal from './DetalleCanchaModal'; 
+import Footer from '../components/Footer';
 
 const canchasData = [
   { id: 1, nombre: "Arena 5 Norte", desc: "Césped sintético FIFA Quality Pro con iluminación LED profesional", precio: 55, tipo: "Sintético" },
@@ -59,6 +60,7 @@ export default function Canchas() {
       {selectedId && (
         <DetalleCanchaModal canchaId={selectedId} onClose={() => setSelectedId(null)} />
       )}
+      <Footer/>
     </div>
   );
 }
