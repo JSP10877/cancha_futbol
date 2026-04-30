@@ -22,10 +22,10 @@ const Home = () => {
         {/* Banner principal - CORREGIDO */}
         <section 
           className="relative h-[80vh] flex items-center justify-center bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1574629810360-7efbbe195018')" }}
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }}
         >
           {/* Capa de degradado */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-slate-900"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-slate-900"></div>
 
           <div className="relative text-center max-w-4xl px-6">
               <h2 className="text-6xl font-extrabold leading-tight">
