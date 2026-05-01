@@ -31,7 +31,9 @@ export default function Reservar() {
 
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
+  const [duracionReserva, setDuracionReserva] = useState(2);
   const [mensaje, setMensaje] = useState("");
+  const [mensajeHorario, setMensajeHorario] = useState("");
 
   if (!cancha) return <p className="text-white p-6">Cancha no encontrada</p>;
 
@@ -40,36 +42,62 @@ export default function Reservar() {
   const horaActual = hoy.getHours();
 
   const bloqueado = data.noDisponibles.includes(fecha);
-  const duracionReserva = 2;
   const totalReserva = cancha.precio * duracionReserva;
 
-  const generarHorarios = () => {
-    const horariosBase = [8, 10, 12, 14, 16, 18, 20, 22];
-
-    if (!fecha) return [];
-
-    if (fecha === fechaHoy) {
-      return horariosBase.filter((h) => h > horaActual);
-    }
-
-    return horariosBase;
-  };
-
-  const horariosDisponibles = generarHorarios();
   const reservasGuardadas =
     JSON.parse(localStorage.getItem("reservas")) || [];
 
-  const ocupadosMock = data.ocupados[fecha] || [];
+  const generarHorarios = () => {
+    if (!fecha) return [];
 
-  const ocupadosLocales = reservasGuardadas
-    .filter(
-      (r) =>
-        r.canchaId === id &&
-        r.fecha === fecha
-    )
-    .map((r) => r.hora);
+    const dia = new Date(fecha).getDay();
+    const inicio = dia === 0 || dia === 6 ? 7 : 8;
+    const cierre = dia === 0 || dia === 6 ? 24 : 23;
 
-  const ocupados = [...new Set([...ocupadosMock, ...ocupadosLocales])];
+    let horarios = [];
+
+    for (let i = inicio; i < cierre; i++) {
+      horarios.push(i);
+    }
+
+    if (fecha === fechaHoy) {
+      horarios = horarios.filter((h) => h > horaActual);
+    }
+
+    return horarios;
+  };
+
+  const horariosDisponibles = generarHorarios();
+
+  // SOLO pinta rojo los bloques ocupados reales
+  const ocupadoPorCruce = (horaNum) => {
+    return reservasGuardadas.some((r) => {
+      if (String(r.canchaId) !== String(id) || r.fecha !== fecha) return false;
+
+      const inicio = parseInt(r.hora.split(":")[0]);
+      const fin = inicio + (r.duracion || 2);
+
+      return horaNum >= inicio && horaNum < fin;
+    });
+  };
+
+
+
+
+
+  // valida si la nueva reserva choca
+  const reservaSeCruza = (horaInicio) => {
+    return reservasGuardadas.some((r) => {
+      if (String(r.canchaId) !== String(id) || r.fecha !== fecha) return false;
+
+      const inicioExistente = parseInt(r.hora.split(":")[0]);
+      const finExistente = inicioExistente + (r.duracion || 2);
+      const nuevoFin = horaInicio + duracionReserva;
+
+      return horaInicio < finExistente && nuevoFin > inicioExistente;
+    });
+  };
+
 
   const guardarReserva = () => {
     if (!user) return;
@@ -79,35 +107,24 @@ export default function Reservar() {
       return;
     }
 
-    const reservas = JSON.parse(localStorage.getItem("reservas")) || [];
-
-    const yaExiste = reservas.some(
-      (r) => r.canchaId === id && r.fecha === fecha && r.hora === hora
-    );
-
-    if (yaExiste) {
-      setMensaje("⚠️ Ese horario ya está reservado");
-      return;
-    }
-
     const nuevaReserva = {
+      idReserva: Date.now(),
       usuario: user.nombre,
       canchaId: id,
       cancha: cancha.nombre,
       fecha,
       hora,
+      duracion: duracionReserva,
     };
 
     localStorage.setItem(
       "reservas",
-      JSON.stringify([...reservas, nuevaReserva])
+      JSON.stringify([...reservasGuardadas, nuevaReserva])
     );
 
-    setMensaje("✅ Reserva realizada con éxito.");
+    setMensaje("✅ Reserva realizada con éxito");
 
-    setTimeout(() => {
-      navigate("/canchas");
-    }, 1800);
+    setTimeout(() => navigate("/canchas"), 1800);
   };
 
   return (
@@ -121,46 +138,29 @@ export default function Reservar() {
       <div className="relative z-10">
         <Navbar paginaActiva="reservas" />
 
-        <div
-          className={`max-w-5xl mx-auto p-6 ${
-            !user ? "blur-sm pointer-events-none" : ""
-          }`}
-        >
-          {/* Header */}
+        <div className={`max-w-5xl mx-auto p-6 ${!user ? "blur-sm pointer-events-none" : ""}`}>
           <div className="bg-white/5 backdrop-blur-xl rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
-            <img
-              src={cancha.imagen}
-              className="w-full h-72 object-cover"
-              alt={cancha.nombre}
-            />
+            <img src={cancha.imagen} className="w-full h-72 object-cover" alt={cancha.nombre} />
 
             <div className="p-8">
-              <h1 className="text-4xl font-bold text-green-400">
-                {cancha.nombre}
-              </h1>
-
+              <h1 className="text-4xl font-bold text-green-400">{cancha.nombre}</h1>
               <p className="text-xl text-yellow-400 mt-2 font-semibold">
                 ${cancha.precio.toLocaleString()} / hora
               </p>
             </div>
           </div>
 
-          {/* Selector */}
           <div className="mt-8 bg-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-xl">
-            <h2 className="text-2xl font-bold mb-6">
-              Selecciona tu reserva
-            </h2>
+            <h2 className="text-2xl font-bold mb-6">Selecciona tu reserva</h2>
 
-            {/* Fecha */}
+            {/* FECHA */}
             <div className="mt-6">
               <label className="block mb-3 text-slate-300 font-medium">
                 Fecha de reserva
               </label>
 
               <div
-                onClick={() =>
-                  document.getElementById("fechaReserva")?.showPicker()
-                }
+                onClick={() => document.getElementById("fechaReserva")?.showPicker()}
                 className={`group relative overflow-hidden rounded-3xl border cursor-pointer transition-all duration-300 ${
                   fecha
                     ? "border-green-400 bg-gradient-to-r from-green-500/10 to-emerald-500/5"
@@ -188,9 +188,7 @@ export default function Reservar() {
 
                     <p className="text-xl font-semibold capitalize">
                       {fecha
-                        ? new Date(
-                            fecha + "T00:00:00"
-                          ).toLocaleDateString("es-CO", {
+                        ? new Date(fecha + "T00:00:00").toLocaleDateString("es-CO", {
                             weekday: "long",
                             day: "numeric",
                             month: "long",
@@ -200,39 +198,124 @@ export default function Reservar() {
                     </p>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-green-500">
-                    📅
-                  </div>
+                  <div className="p-4 rounded-2xl bg-green-500">📅</div>
                 </div>
               </div>
             </div>
 
-            {/* Horarios */}
+            {mensajeHorario && (
+              <div className="mt-5 p-4 rounded-2xl bg-yellow-500/20 border border-yellow-400 text-yellow-300 text-center">
+                {mensajeHorario}
+              </div>
+            )}
+
+            {/* DURACIÓN */}
+            {fecha && (
+              <div className="mt-6">
+                <label className="block mb-3 text-slate-300 font-medium">
+                  Horas a reservar
+                </label>
+
+                <div className="flex gap-3 flex-wrap">
+                  {[2, 3, 4, 5, 6].map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => {
+                        setDuracionReserva(d);
+                        setHora("");
+                      }}
+                      className={`px-5 py-3 rounded-xl ${
+                        duracionReserva === d
+                          ? "bg-green-500"
+                          : "bg-white/10 hover:bg-white/20"
+                      }`}
+                    >
+                      {d} horas
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* HORARIOS */}
             {fecha && !bloqueado && (
               <div className="mt-8">
                 <h3 className="text-xl font-semibold mb-4">
-                  Bloques disponibles (2 horas)
+                  Horarios disponibles
                 </h3>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {horariosDisponibles.map((horaNum) => {
                     const h = `${horaNum.toString().padStart(2, "0")}:00`;
-                    const ocupado = ocupados.includes(h);
+
+                    const ocupado = ocupadoPorCruce(horaNum);
+                    const cruceReserva = !ocupado && reservaSeCruza(horaNum);
+
+                    const dia = new Date(fecha).getDay();
+                    const horaCierre = dia === 0 || dia === 6 ? 24 : 23;
+
+                    const horaSeleccionada = hora
+                      ? parseInt(hora.split(":")[0])
+                      : null;
+
+                    const dentroDelRango =
+                      !ocupado &&
+                      horaSeleccionada !== null &&
+                      horaNum >= horaSeleccionada &&
+                      horaNum < horaSeleccionada + duracionReserva;
 
                     return (
                       <button
                         key={h}
-                        disabled={ocupado}
-                        onClick={() => setHora(h)}
+                        disabled={false}
+
+
+                        onClick={() => {
+                          const dia = new Date(fecha).getDay();
+                          const horaCierre = dia === 0 || dia === 6 ? 24 : 23;
+
+                          let nuevaHora = horaNum;
+                          let mensajeAuto = "";
+
+                          // si excede cierre
+                          if (horaNum + duracionReserva > horaCierre) {
+                            nuevaHora = horaCierre - duracionReserva;
+                            mensajeAuto = "⚠️ Excede horario, ajustado automáticamente";
+                          }
+
+                          // si se cruza
+                          while (nuevaHora >= 8 && reservaSeCruza(nuevaHora)) {
+                            nuevaHora--;
+                            mensajeAuto = "⚠️ Se cruza con otra reserva, ajustado automáticamente";
+                          }
+
+
+                          if (nuevaHora < 8) {
+                            setMensajeHorario("❌ No hay espacio disponible");
+                            setTimeout(() => setMensajeHorario(""), 5000);
+                            return;
+                          }
+
+                          setHora(`${nuevaHora.toString().padStart(2, "0")}:00`);
+
+                          if (mensajeAuto) {
+                            setMensajeHorario(mensajeAuto);
+                            setTimeout(() => setMensajeHorario(""), 5000);
+                          }
+                        }}
+
+
                         className={`p-4 rounded-2xl font-semibold transition-all ${
-                          ocupado
-                            ? "bg-red-500/40 cursor-not-allowed"
-                            : hora === h
+                          dentroDelRango
                             ? "bg-green-500 scale-105 shadow-lg"
+                            : ocupado
+                            ? "bg-red-500/50 cursor-not-allowed"
+                            : cruceReserva
+                            ? "bg-slate-300/40 hover:bg-slate-300/60"
                             : "bg-white/10 hover:bg-white/20"
                         }`}
                       >
-                        {h}
+                        {`${horaNum}:00 - ${horaNum + 1}:00`}
                       </button>
                     );
                   })}
@@ -240,19 +323,16 @@ export default function Reservar() {
               </div>
             )}
 
-            {/* Resumen */}
+            {/* RESUMEN */}
             {hora && (
               <div className="mt-8 bg-white/10 rounded-2xl p-5 border border-white/10">
-                <h3 className="font-bold text-green-400 mb-3">
-                  Resumen
-                </h3>
+                <h3 className="font-bold text-green-400 mb-3">Resumen</h3>
 
                 <p>{cancha.nombre}</p>
                 <p>{fecha}</p>
-
-
-
-                <p>{hora} - {parseInt(hora.split(":")[0]) + duracionReserva}:00</p>
+                <p>
+                  {hora} - {parseInt(hora.split(":")[0]) + duracionReserva}:00
+                </p>
 
                 <p className="text-slate-300 mt-2">
                   {cancha.precio.toLocaleString()} x {duracionReserva} horas
@@ -261,13 +341,9 @@ export default function Reservar() {
                 <p className="text-yellow-400 font-bold mt-3 text-xl">
                   Total: ${totalReserva.toLocaleString()}
                 </p>
-
-
-
               </div>
             )}
 
-            {/* Botón */}
             {hora && (
               <button
                 onClick={guardarReserva}
@@ -276,16 +352,9 @@ export default function Reservar() {
                 Confirmar reserva
               </button>
             )}
-
-            {mensaje && (
-              <div className="mt-5 p-4 rounded-2xl bg-green-500/15 border border-green-400 text-center animate-pulse">
-                {mensaje}
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Modal login */}
         {!user && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50">
             <div className="bg-white/5 backdrop-blur-xl p-10 rounded-3xl text-center max-w-md border border-white/10">

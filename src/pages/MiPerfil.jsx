@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
-
 import fondo from "../assets/images/futbol.jpg";
 
 export default function MiPerfil() {
@@ -10,6 +9,8 @@ export default function MiPerfil() {
   const [esLogin, setEsLogin] = useState(true);
   const [tab, setTab] = useState("perfil");
   const [editando, setEditando] = useState(false);
+  const [mensaje, setMensaje] = useState("");
+  const [reservaAbierta, setReservaAbierta] = useState(null);
 
   const [form, setForm] = useState({
     nombre: "",
@@ -22,9 +23,12 @@ export default function MiPerfil() {
     password: ""
   });
 
-  const [mensaje, setMensaje] = useState("");
-  const [reservaAbierta, setReservaAbierta] = useState(null);
+  const [reservas, setReservas] = useState([]);
 
+  useEffect(() => {
+    const guardadas = JSON.parse(localStorage.getItem("reservas")) || [];
+    setReservas(guardadas);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -41,15 +45,22 @@ export default function MiPerfil() {
     }
   }, [user]);
 
-  const reservas = JSON.parse(localStorage.getItem("reservas")) || [];
   const hoy = new Date().toISOString().split("T")[0];
 
-  const reservasUsuario = reservas.filter(
-    (r) => r.usuario === user?.nombre
-  );
+  const reservasUsuario = reservas
+    .map((r, index) => ({ ...r, index }))
+    .filter((r) => r.usuario === user?.nombre);
 
   const activas = reservasUsuario.filter(r => r.fecha >= hoy);
   const historial = reservasUsuario.filter(r => r.fecha < hoy);
+  const ahora = new Date();
+
+  const proximasReservas = activas.filter((r) => {
+    const fechaReserva = new Date(`${r.fecha}T${r.hora}`);
+    const diferenciaHoras = (fechaReserva - ahora) / (1000 * 60 * 60);
+
+    return diferenciaHoras > 0 && diferenciaHoras <= 12;
+  });
 
   const manejarSubmit = (e) => {
     e.preventDefault();
@@ -77,9 +88,27 @@ export default function MiPerfil() {
     setEditando(false);
   };
 
+  const cancelarReserva = (indexReserva) => {
+    const nuevasReservas = reservas.filter((_, i) => i !== indexReserva);
+
+    localStorage.setItem("reservas", JSON.stringify(nuevasReservas));
+    setReservas(nuevasReservas);
+    setReservaAbierta(null);
+    setMensaje("✅ Reserva cancelada correctamente");
+  };
+
+  const obtenerPrecio = (cancha) => {
+    if (cancha.includes("Arena 5 Norte")) return 35000;
+    if (cancha.includes("Arena 5 Sur")) return 45000;
+    if (cancha.includes("Estadio Urbano")) return 48000;
+    if (cancha.includes("Padel Cancha 1")) return 25000;
+    if (cancha.includes("Padel Cancha 2")) return 25000;
+    if (cancha.includes("Padel Cancha 3")) return 30000;
+    return 35000;
+  };
+
   return (
     <div className="relative min-h-screen text-white">
-
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url(${fondo})` }}
@@ -93,7 +122,6 @@ export default function MiPerfil() {
 
           {!user && (
             <div className="max-w-md mx-auto bg-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-2xl">
-
               <h2 className="text-3xl font-bold text-center mb-6">
                 {esLogin ? "Bienvenido" : "Crear cuenta"}
               </h2>
@@ -132,7 +160,6 @@ export default function MiPerfil() {
                 <button className="w-full bg-green-500 hover:bg-green-600 py-3 rounded-xl font-bold">
                   {esLogin ? "Entrar" : "Registrarse"}
                 </button>
-
               </form>
 
               <p
@@ -141,21 +168,35 @@ export default function MiPerfil() {
               >
                 {esLogin ? "Crear cuenta" : "Iniciar sesión"}
               </p>
-
-              {mensaje && (
-                <p className="text-center mt-3 text-green-400">
-                  {mensaje}
-                </p>
-              )}
             </div>
           )}
 
           {user && (
-            <div className="space-y-6">
+            <>
+              {proximasReservas.length > 0 && (
+                <div className="mb-6 bg-yellow-500/15 border border-yellow-400 rounded-3xl p-5 animate-pulse shadow-xl">
+                  <h3 className="text-yellow-300 font-bold text-xl mb-3">
+                    ⏰ Recordatorio de reserva
+                  </h3>
+
+                  {proximasReservas.map((r, i) => (
+                    <div key={i} className="mb-2">
+                      <p className="font-semibold text-white">
+                        {r.cancha}
+                      </p>
+
+                      <p className="text-yellow-200 text-sm">
+                        {r.fecha} • {r.hora}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="space-y-6">
 
               {/* HEADER */}
               <div className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-xl flex justify-between items-center">
-
                 <div>
                   <h2 className="text-3xl font-bold text-green-400">
                     {user.nombre}
@@ -174,7 +215,6 @@ export default function MiPerfil() {
 
               {/* TABS */}
               <div className="flex gap-3 bg-white/5 backdrop-blur p-2 rounded-full w-fit border border-white/10">
-
                 {["perfil", "reservas", "wallet"].map(t => (
                   <button
                     key={t}
@@ -192,16 +232,11 @@ export default function MiPerfil() {
 
               {/* PERFIL */}
               {tab === "perfil" && (
-                <div className="bg-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/10 space-y-6">
-
-                  <div className="flex justify-between items-center">
-                    <div>
-                    <h3 className="text-2xl font-bold">Información personal</h3>
-                    <p className="text-slate-400">
-                     Administra tu cuenta
-                    </p>
-                    </div>
-
+                <div className="bg-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/10">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold">
+                      Información personal
+                    </h3>
 
                     <button
                       onClick={() => {
@@ -231,7 +266,7 @@ export default function MiPerfil() {
                         onChange={(e) =>
                           setForm({ ...form, [campo]: e.target.value })
                         }
-                        className="p-4 rounded-xl bg-white/10 border border-white/10 disabled:opacity-70"
+                        className="p-4 rounded-xl bg-white/10 border border-white/10"
                       />
                     ))}
                   </div>
@@ -241,94 +276,78 @@ export default function MiPerfil() {
               {/* RESERVAS */}
               {tab === "reservas" && (
                 <div className="grid md:grid-cols-2 gap-6">
+
                   <div className="bg-white/5 backdrop-blur-xl p-5 rounded-3xl border border-white/10">
-                    <h3 className="text-green-400 font-bold mb-4">Reservas activas</h3>
-
-
+                    <h3 className="text-green-400 font-bold mb-4">
+                      Reservas activas
+                    </h3>
 
                     {activas.length === 0 ? (
-                      <p className="text-slate-400">No tienes reservas activas</p>
+                      <p className="text-slate-400">
+                        No tienes reservas activas
+                      </p>
                     ) : (
                       activas.map((r, i) => {
                         const abierta = reservaAbierta === i;
-
-                        const precioHora =
-                          r.cancha.includes("Arena 5 Norte") ? 35000 :
-                          r.cancha.includes("Arena 5 Sur") ? 45000 :
-                          r.cancha.includes("Estadio Urbano") ? 48000 :
-                          r.cancha.includes("Padel Cancha 1") ? 25000 :
-                          r.cancha.includes("Padel Cancha 2") ? 25000 :
-                          r.cancha.includes("Padel Cancha 3") ? 30000 :
-                          35000;
-
-                        const total = precioHora * 2;
+                        const precioHora = obtenerPrecio(r.cancha);
+                        const duracion = r.duracion || 2;
+                        const total = precioHora * duracion;
 
                         return (
-                          <div
-                            key={i}
-                            className="bg-white/10 rounded-2xl mb-3 overflow-hidden border border-white/10"
-                          >
+                          <div key={i} className="bg-white/10 rounded-2xl mb-3 overflow-hidden">
                             <button
-                              onClick={() =>
-                                setReservaAbierta(abierta ? null : i)
-                              }
-                              className="w-full p-4 flex justify-between items-center hover:bg-white/5 transition"
+                              onClick={() => setReservaAbierta(abierta ? null : i)}
+                              className="w-full p-4 flex justify-between"
                             >
                               <div className="text-left">
-                                <p className="font-semibold">{r.cancha}</p>
+                                <p>{r.cancha}</p>
                                 <p className="text-sm text-slate-400">
                                   {r.fecha} • {r.hora}
                                 </p>
                               </div>
 
-                              <span className="text-green-400 text-xl">
-                                {abierta ? "−" : "+"}
-                              </span>
+                              <span>{abierta ? "−" : "+"}</span>
                             </button>
 
                             {abierta && (
-                              <div className="px-4 pb-4 border-t border-white/10 animate-fadeIn">
-                                <div className="pt-4 space-y-2 text-sm">
+                              <div className="p-4 border-t border-white/10">
+                                <p>{duracion} horas</p>
+                                <p>
+                                  {r.hora} - {parseInt(r.hora) + duracion}:00
+                                </p>
+                                <p>${precioHora.toLocaleString()} / hora</p>
 
-                                  <p>
-                                    <span className="text-slate-400">Duración:</span> 2 horas
-                                  </p>
+                                <p className="text-yellow-400 font-bold mt-2">
+                                  Total: ${total.toLocaleString()}
+                                </p>
 
-                                  <p>
-                                    <span className="text-slate-400">Horario:</span>{" "}
-                                    {r.hora} - {parseInt(r.hora.split(":")[0]) + 2}:00
-                                  </p>
-
-                                  <p>
-                                    <span className="text-slate-400">Precio por hora:</span>{" "}
-                                    ${precioHora.toLocaleString()}
-                                  </p>
-
-                                  <p className="text-yellow-400 font-bold text-lg mt-3">
-                                    Total: ${total.toLocaleString()}
-                                  </p>
-
-                                </div>
+                                <button
+                                  onClick={() => cancelarReserva(r.index)}
+                                  className="mt-4 w-full bg-red-500 hover:bg-red-600 py-3 rounded-xl"
+                                >
+                                  Cancelar reserva
+                                </button>
                               </div>
                             )}
                           </div>
                         );
                       })
                     )}
-
-
-
-
                   </div>
+
                   <div className="bg-white/5 backdrop-blur-xl p-5 rounded-3xl border border-white/10">
-                    <h3 className="text-slate-400 font-bold mb-4">Historial</h3>
+                    <h3 className="text-slate-400 font-bold mb-4">
+                      Historial
+                    </h3>
 
                     {historial.length === 0 ? (
-                      <p className="text-slate-400">Sin historial</p>
+                      <p>Sin historial</p>
                     ) : (
                       historial.map((r, i) => (
                         <div key={i} className="bg-white/10 p-4 rounded-xl mb-2 opacity-60">
-                          {r.cancha} • {r.fecha}
+                          <p>{r.cancha}</p>
+                          <p>{r.fecha} • {r.hora}</p>
+                          <p>{r.duracion || 2} horas</p>
                         </div>
                       ))
                     )}
@@ -336,66 +355,66 @@ export default function MiPerfil() {
                 </div>
               )}
 
-              {/* WALLET PROFESIONAL */}
+              {/* WALLET */}
               {tab === "wallet" && (
-                <div className="relative overflow-hidden rounded-3xl shadow-2xl">
+                              <div className="relative overflow-hidden rounded-3xl shadow-2xl">
 
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-green-700 to-slate-900" />
+                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-green-700 to-slate-900" />
 
-                  <div className="relative z-10 p-10">
+                                <div className="relative z-10 p-10">
 
-                    <div className="flex justify-between items-start mb-10">
-                      <div>
-                        <p className="text-sm uppercase tracking-widest text-white/70">
-                          Crédito disponible
-                        </p>
+                                  <div className="flex justify-between items-start mb-10">
+                                    <div>
+                                      <p className="text-sm uppercase tracking-widest text-white/70">
+                                        Crédito disponible
+                                      </p>
 
-                        <h2 className="text-6xl font-bold mt-3">
-                          ${user.wallet || 0}
-                        </h2>
-                      </div>
+                                      <h2 className="text-6xl font-bold mt-3">
+                                        ${user.wallet || 0}
+                                      </h2>
+                                    </div>
 
-                      <div className="text-right">
-                        <p className="text-white/70 text-sm">
-                          Estado
-                        </p>
-                        <p className="font-semibold text-green-300">
-                          Cuenta activa
-                        </p>
-                      </div>
-                    </div>
+                                    <div className="text-right">
+                                      <p className="text-white/70 text-sm">
+                                        Estado
+                                      </p>
+                                      <p className="font-semibold text-green-300">
+                                        Cuenta activa
+                                      </p>
+                                    </div>
+                                  </div>
 
-                    <div className="grid md:grid-cols-2 gap-4">
+                                  <div className="grid md:grid-cols-2 gap-4">
 
-                      <div className="bg-white/10 backdrop-blur-lg p-5 rounded-2xl">
-                        <h4 className="font-bold mb-2">
-                          Solicitar recarga
-                        </h4>
-                        <p className="text-sm text-white/70">
-                          Para añadir saldo comunícate con administración o realiza una recarga presencial.
-                        </p>
-                      </div>
+                                    <div className="bg-white/10 backdrop-blur-lg p-5 rounded-2xl">
+                                      <h4 className="font-bold mb-2">
+                                        Solicitar recarga
+                                      </h4>
+                                      <p className="text-sm text-white/70">
+                                        Para añadir saldo comunícate con administración o realiza una recarga presencial.
+                                      </p>
+                                    </div>
 
-                      <div className="bg-white/10 backdrop-blur-lg p-5 rounded-2xl">
-                        <h4 className="font-bold mb-2">
-                          Última operación
-                        </h4>
-                        <p className="text-sm text-white/70">
-                          No hay movimientos recientes
-                        </p>
-                      </div>
+                                    <div className="bg-white/10 backdrop-blur-lg p-5 rounded-2xl">
+                                      <h4 className="font-bold mb-2">
+                                        Última operación
+                                      </h4>
+                                      <p className="text-sm text-white/70">
+                                        No hay movimientos recientes
+                                      </p>
+                                    </div>
 
-                    </div>
+                                  </div>
 
-                    <button
-                      className="mt-8 w-full bg-white text-slate-900 py-4 rounded-2xl font-bold hover:scale-[1.01] transition"
-                    >
-                      Solicitar recarga de crédito
-                    </button>
+                                  <button
+                                    className="mt-8 w-full bg-white text-slate-900 py-4 rounded-2xl font-bold hover:scale-[1.01] transition"
+                                  >
+                                    Solicitar recarga de crédito
+                                  </button>
 
-                  </div>
-                </div>
-              )}
+                                </div>
+                              </div>
+                            )}
 
               {mensaje && (
                 <p className="text-center text-green-400">
@@ -404,6 +423,7 @@ export default function MiPerfil() {
               )}
 
             </div>
+           </>
           )}
         </div>
       </div>
