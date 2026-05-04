@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import Navbar from '../components/Navbar'; 
-import DetalleCanchaModal from './DetalleCanchaModal'; 
+import React, { useState, useMemo } from 'react';
+import Navbar from '../components/Navbar';
+import DetalleCanchaModal from './DetalleCanchaModal';
 import Footer from '../components/Footer';
 
-import { Link } from "react-router-dom";
-
-//Incorporacion de las imagenes de las canchas
+// Incorporación de las imágenes
 import canchasfutbol from '../assets/images/futbol.jpg';
 import canchaspadel from '../assets/images/padel.jpg';
 import canchasvoleibol1 from '../assets/images/canchavoleibol.jpg';
@@ -25,22 +23,25 @@ const canchasData = [
 
 const TarjetaCancha = ({ cancha, onOpen }) => (
   <div style={styles.card}>
-    <img 
-      src={cancha.imagen} // <--- CAMBIO AQUÍ: Ahora es dinámico
-      alt={cancha.nombre} 
-      style={styles.image} 
+    <img
+      src={cancha.imagen}
+      alt={cancha.nombre}
+      style={styles.image}
     />
+
     <div style={styles.content}>
       <h3 style={styles.title}>{cancha.nombre}</h3>
       <p style={styles.description}>{cancha.desc}</p>
+
       <div style={styles.infoRow}>
         <span style={styles.badge}>{cancha.tipo}</span>
         <span style={styles.price}>${cancha.precio}</span>
       </div>
-      <button 
-        style={styles.buttonMain} 
+
+      <button
+        style={styles.buttonMain}
         onClick={() => onOpen(cancha.id)}
-        onMouseOver={(e) => e.target.style.backgroundColor = '#059669'} // Verde 2 tonos más oscuro
+        onMouseOver={(e) => e.target.style.backgroundColor = '#059669'}
         onMouseOut={(e) => e.target.style.backgroundColor = '#10b981'}
       >
         Reservar
@@ -51,17 +52,44 @@ const TarjetaCancha = ({ cancha, onOpen }) => (
 
 export default function Canchas() {
   const [selectedId, setSelectedId] = useState(null);
+  const [busqueda, setBusqueda] = useState("");
+  const [tipoFiltro, setTipoFiltro] = useState("Todos");
+  const [ordenPrecio, setOrdenPrecio] = useState("default");
+
+  const canchasFiltradas = useMemo(() => {
+    let resultado = [...canchasData];
+
+    if (busqueda.trim()) {
+      resultado = resultado.filter(cancha =>
+        cancha.nombre.toLowerCase().includes(busqueda.toLowerCase())
+      );
+    }
+
+    if (tipoFiltro !== "Todos") {
+      resultado = resultado.filter(cancha => cancha.tipo === tipoFiltro);
+    }
+
+    if (ordenPrecio === "asc") {
+      resultado.sort((a, b) => a.precio - b.precio);
+    }
+
+    if (ordenPrecio === "desc") {
+      resultado.sort((a, b) => b.precio - a.precio);
+    }
+
+    return resultado;
+  }, [busqueda, tipoFiltro, ordenPrecio]);
 
   return (
     <div style={styles.mainWrapper}>
       <Navbar />
 
-      {/* Hero Section: Fondo azul marino oscuro y título bicolor */}
       <section style={styles.heroSection}>
         <div style={styles.heroContainer}>
           <h1 className="text-center text-6xl font-bold mb-6 text-green-500">
             <span className="text-white">Nuestras</span> Canchas
           </h1>
+
           <p className="text-center text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
             Espacios diseñados para vivir el fútbol con intensidad, comodidad y calidad profesional.
           </p>
@@ -69,63 +97,182 @@ export default function Canchas() {
       </section>
 
       <main style={styles.container}>
-        <div style={styles.grid}>
-          {canchasData.map(cancha => (
-            <TarjetaCancha key={cancha.id} cancha={cancha} onOpen={setSelectedId} />
-          ))}
+
+        <div style={styles.filters}>
+          <input
+            type="text"
+            placeholder="Buscar cancha..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            style={styles.searchInput}
+          />
+
+          <select
+            value={tipoFiltro}
+            onChange={(e) => setTipoFiltro(e.target.value)}
+            style={styles.select}
+          >
+            <option>Todos</option>
+            <option>Sintético</option>
+            <option>Natural</option>
+            <option>Piso</option>
+            <option>Arena</option>
+          </select>
+
+          <select
+            value={ordenPrecio}
+            onChange={(e) => setOrdenPrecio(e.target.value)}
+            style={styles.select}
+          >
+            <option value="default">Ordenar precio</option>
+            <option value="asc">Menor a mayor</option>
+            <option value="desc">Mayor a menor</option>
+          </select>
         </div>
 
-
+        <div style={styles.grid}>
+          {canchasFiltradas.map(cancha => (
+            <TarjetaCancha
+              key={cancha.id}
+              cancha={cancha}
+              onOpen={setSelectedId}
+            />
+          ))}
+        </div>
 
       </main>
 
       {selectedId && (
-        <DetalleCanchaModal canchaId={selectedId} onClose={() => setSelectedId(null)} />
+        <DetalleCanchaModal
+          canchaId={selectedId}
+          onClose={() => setSelectedId(null)}
+        />
       )}
-      <Footer/>
+
+      <Footer />
     </div>
   );
 }
 
 const styles = {
-  mainWrapper: { backgroundColor: '#111827', minHeight: '100vh', fontFamily: 'sans-serif' },
-  
-  // Estilos para la sección de título diferenciada
+  mainWrapper: {
+    backgroundColor: '#111827',
+    minHeight: '100vh',
+    fontFamily: 'sans-serif'
+  },
+
   heroSection: {
-    backgroundColor: '#2f3745', 
+    backgroundColor: '#2f3745',
     padding: '80px 20px',
     borderBottom: '1px solid #1e293b'
   },
+
   heroContainer: {
     maxWidth: '1200px',
-    margin: '0 auto',
+    margin: '0 auto'
   },
 
-  container: { padding: '60px 20px' },
-  grid: { 
-    display: 'grid', 
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-    gap: '24px', 
-    maxWidth: '1200px', 
-    margin: '0 auto' 
+  container: {
+    padding: '60px 20px'
   },
-  card: { backgroundColor: '#1e293b', borderRadius: '16px', overflow: 'hidden', border: '1px solid #334155' },
-  image: { width: '100%', height: '180px', objectFit: 'cover' },
-  content: { padding: '20px' },
-  title: { color: '#10b981', margin: '0 0 10px 0', fontSize: '1.25rem', fontWeight: 'bold' },
-  description: { color: '#94a3b8', fontSize: '0.9rem', height: '40px', marginBottom: '20px' },
-  infoRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' },
-  badge: { backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', padding: '4px 12px', borderRadius: '9999px', fontSize: '0.75rem' },
-  price: { color: '#f59e0b', fontWeight: 'bold', fontSize: '1.2rem' },
-  buttonMain: { 
-    width: '100%', 
-    backgroundColor: '#10b981', 
-    color: 'white', 
-    border: 'none', 
-    padding: '12px', 
-    borderRadius: '10px', 
-    fontWeight: 'bold', 
-    cursor: 'pointer', 
-    transition: '0.2s' 
+
+  filters: {
+    display: 'flex',
+    gap: '16px',
+    marginBottom: '30px',
+    flexWrap: 'wrap',
+    maxWidth: '1200px',
+    margin: '0 auto 30px auto'
+  },
+
+  searchInput: {
+    flex: 1,
+    minWidth: '250px',
+    padding: '12px',
+    borderRadius: '10px',
+    border: '1px solid #334155',
+    backgroundColor: '#1e293b',
+    color: '#fff'
+  },
+
+  select: {
+    padding: '12px',
+    borderRadius: '10px',
+    border: '1px solid #334155',
+    backgroundColor: '#1e293b',
+    color: '#fff',
+    cursor: 'pointer'
+  },
+
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+    gap: '24px',
+    maxWidth: '1200px',
+    margin: '0 auto'
+  },
+
+  card: {
+    backgroundColor: '#1e293b',
+    borderRadius: '16px',
+    overflow: 'hidden',
+    border: '1px solid #334155'
+  },
+
+  image: {
+    width: '100%',
+    height: '180px',
+    objectFit: 'cover'
+  },
+
+  content: {
+    padding: '20px'
+  },
+
+  title: {
+    color: '#10b981',
+    margin: '0 0 10px 0',
+    fontSize: '1.25rem',
+    fontWeight: 'bold'
+  },
+
+  description: {
+    color: '#94a3b8',
+    fontSize: '0.9rem',
+    height: '40px',
+    marginBottom: '20px'
+  },
+
+  infoRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px'
+  },
+
+  badge: {
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    color: '#10b981',
+    padding: '4px 12px',
+    borderRadius: '9999px',
+    fontSize: '0.75rem'
+  },
+
+  price: {
+    color: '#f59e0b',
+    fontWeight: 'bold',
+    fontSize: '1.2rem'
+  },
+
+  buttonMain: {
+    width: '100%',
+    backgroundColor: '#10b981',
+    color: 'white',
+    border: 'none',
+    padding: '12px',
+    borderRadius: '10px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    transition: '0.2s'
   }
 };
