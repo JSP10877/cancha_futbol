@@ -77,48 +77,21 @@ export default function Home() {
 
 
 
-
-        {/* HERO ULTRA LIMPIO */}
-        <section
-          className="relative h-[88vh] flex items-center justify-start bg-cover bg-center"
-
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1400')",
-          }}
+        {/* Banner principal - CORREGIDO */}
+        <section 
+          className="relative h-[80vh] flex items-center justify-center bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }}
         >
+          {/* Capa de degradado */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-slate-900"></div>
 
-          {/* base */}
-          <div className="absolute inset-0 bg-black/65"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-[#06110c]"></div>
-
-          {/* glow suave */}
-          <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 bg-green-500/10 blur-[140px]"></div>
-
-          {/* contenido */}
-          <div className="relative text-left px-6 max-w-3xl ml-0">
-
-            <p className="text-green-400 tracking-[0.35em] text-xs mb-6">
-              RESERVAS DEPORTIVAS
-            </p>
-
-            <h1 className="text-5xl md:text-7xl font-black leading-[1.05]">
-              Juega.
-              <span className="block text-green-500">
-                Reserva.
-              </span>
-              Disfruta.
-            </h1>
-
-            <p className="mt-8 text-slate-300 text-lg leading-relaxed">
-              Canchas de fútbol, pádel y voleibol en un solo lugar.
-              Reserva en segundos, sin complicaciones.
-            </p>
-
+          <div className="relative text-center max-w-4xl px-6">
+              <h2 className="text-6xl font-extrabold leading-tight">
+                  Bienvenido a <span className="text-green-500">Futbol 5</span>
+              </h2>
           </div>
 
         </section>
-
 
 
 
