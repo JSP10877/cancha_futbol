@@ -10,23 +10,20 @@ import canchasvoleibol1 from '../assets/images/canchavoleibol.jpg';
 import canchasvoleibol2 from '../assets/images/canchapisovoleibol.jpg';
 import canchasbasket from '../assets/images/canchabasket.jpg';
 import canchastenis from '../assets/images/canchatenis.jpg';
+import logotipo from '../assets/images/logotipo.png';
 
 const canchasData = [
   { id: 1, nombre: "Arena 5 Norte", desc: "Césped sintético FIFA Quality Pro con iluminación LED profesional", precio: 35000, tipo: "Sintético", imagen: canchasfutbol },
   { id: 2, nombre: "Arena 5 Sur", desc: "Cancha techada con graderías y vestuarios completos", precio: 45000, tipo: "Sintético", imagen: canchasfutbol },
   { id: 3, nombre: "Estadio Urbano", desc: "Césped natural premium con sistema de drenaje", precio: 48000, tipo: "Natural", imagen: canchasfutbol },
-
   { id: 4, nombre: "Padel Cancha 1", desc: "Ideal para partidos rápidos y torneos empresariales", precio: 25000, tipo: "Piso", imagen: canchaspadel },
   { id: 5, nombre: "Padel Cancha 2", desc: "Iluminación nocturna HD y marcador electrónico", precio: 25000, tipo: "Piso", imagen: canchaspadel },
   { id: 6, nombre: "Padel Cancha 3", desc: "Ambiente recreativo con zona de comidas", precio: 30000, tipo: "Piso", imagen: canchaspadel },
-
   { id: 7, nombre: "Voleibol Arena 1", desc: "Espacio ideal para partidos recreativos sobre arena profesional", precio: 35000, tipo: "Arena", imagen: canchasvoleibol1 },
   { id: 8, nombre: "Voleibol Piso", desc: "Cancha indoor con marcador electrónico", precio: 35000, tipo: "Piso", imagen: canchasvoleibol2 },
   { id: 9, nombre: "Voleibol Arena 2", desc: "Perfecta para encuentros amistosos", precio: 30000, tipo: "Arena", imagen: canchasvoleibol1 },
-
   { id: 10, nombre: "Tenis Court 1", desc: "Cancha profesional de superficie rápida con iluminación LED", precio: 32000, tipo: "Piso", imagen: canchastenis },
   { id: 11, nombre: "Tenis Court 2", desc: "Espacio premium para entrenamiento y competición", precio: 35000, tipo: "Piso", imagen: canchastenis },
-
   { id: 12, nombre: "Basket Arena 1", desc: "Cancha full court con tablero profesional", precio: 28000, tipo: "Piso", imagen: canchasbasket },
   { id: 13, nombre: "Basket Arena 2", desc: "Iluminación HD y gradería lateral", precio: 30000, tipo: "Piso", imagen: canchasbasket },
 ];
@@ -38,16 +35,13 @@ const TarjetaCancha = ({ cancha, onOpen }) => (
       alt={cancha.nombre}
       style={styles.image}
     />
-
     <div style={styles.content}>
       <h3 style={styles.title}>{cancha.nombre}</h3>
       <p style={styles.description}>{cancha.desc}</p>
-
       <div style={styles.infoRow}>
         <span style={styles.badge}>{cancha.tipo}</span>
         <span style={styles.price}>${cancha.precio}</span>
       </div>
-
       <button
         style={styles.buttonMain}
         onClick={() => onOpen(cancha.id)}
@@ -68,25 +62,20 @@ export default function Canchas() {
 
   const canchasFiltradas = useMemo(() => {
     let resultado = [...canchasData];
-
     if (busqueda.trim()) {
       resultado = resultado.filter(cancha =>
         cancha.nombre.toLowerCase().includes(busqueda.toLowerCase())
       );
     }
-
     if (tipoFiltro !== "Todos") {
       resultado = resultado.filter(cancha => cancha.tipo === tipoFiltro);
     }
-
     if (ordenPrecio === "asc") {
       resultado.sort((a, b) => a.precio - b.precio);
     }
-
     if (ordenPrecio === "desc") {
       resultado.sort((a, b) => b.precio - a.precio);
     }
-
     return resultado;
   }, [busqueda, tipoFiltro, ordenPrecio]);
 
@@ -99,15 +88,13 @@ export default function Canchas() {
           <h1 className="text-center text-6xl font-bold mb-6 text-green-500">
             <span className="text-white">Nuestras</span> Canchas
           </h1>
-
-          <p className="text-center text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-center text-xl text-white max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-2xl">
             Espacios diseñados para vivir el fútbol con intensidad, comodidad y calidad profesional.
           </p>
         </div>
       </section>
 
       <main style={styles.container}>
-
         <div style={styles.filters}>
           <input
             type="text"
@@ -116,7 +103,6 @@ export default function Canchas() {
             onChange={(e) => setBusqueda(e.target.value)}
             style={styles.searchInput}
           />
-
           <select
             value={tipoFiltro}
             onChange={(e) => setTipoFiltro(e.target.value)}
@@ -128,7 +114,6 @@ export default function Canchas() {
             <option>Piso</option>
             <option>Arena</option>
           </select>
-
           <select
             value={ordenPrecio}
             onChange={(e) => setOrdenPrecio(e.target.value)}
@@ -149,7 +134,6 @@ export default function Canchas() {
             />
           ))}
         </div>
-
       </main>
 
       {selectedId && (
@@ -158,7 +142,6 @@ export default function Canchas() {
           onClose={() => setSelectedId(null)}
         />
       )}
-
       <Footer />
     </div>
   );
@@ -170,22 +153,20 @@ const styles = {
     minHeight: '100vh',
     fontFamily: 'sans-serif'
   },
-
   heroSection: {
-    background: 'linear-gradient(to bottom, #020617, #111827)',
+    backgroundImage: `linear-gradient(to bottom, rgba(2, 6, 23, 0.6), rgba(17, 24, 39, 0.8)), url(${logotipo})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
     padding: '120px 20px 80px',
     borderBottom: '1px solid #1e293b'
   },
-
   heroContainer: {
     maxWidth: '1200px',
     margin: '0 auto'
   },
-
   container: {
     padding: '60px 20px'
   },
-
   filters: {
     display: 'flex',
     gap: '16px',
@@ -194,7 +175,6 @@ const styles = {
     maxWidth: '1200px',
     margin: '0 auto 30px auto'
   },
-
   searchInput: {
     flex: 1,
     minWidth: '250px',
@@ -204,7 +184,6 @@ const styles = {
     backgroundColor: '#1e293b',
     color: '#fff'
   },
-
   select: {
     padding: '12px',
     borderRadius: '10px',
@@ -213,7 +192,6 @@ const styles = {
     color: '#fff',
     cursor: 'pointer'
   },
-
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
@@ -221,45 +199,38 @@ const styles = {
     maxWidth: '1200px',
     margin: '0 auto'
   },
-
   card: {
     backgroundColor: '#1e293b',
     borderRadius: '16px',
     overflow: 'hidden',
     border: '1px solid #334155'
   },
-
   image: {
     width: '100%',
     height: '180px',
     objectFit: 'cover'
   },
-
   content: {
     padding: '20px'
   },
-
   title: {
     color: '#10b981',
     margin: '0 0 10px 0',
     fontSize: '1.25rem',
     fontWeight: 'bold'
   },
-
   description: {
     color: '#94a3b8',
     fontSize: '0.9rem',
     height: '40px',
     marginBottom: '20px'
   },
-
   infoRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '20px'
   },
-
   badge: {
     backgroundColor: 'rgba(16, 185, 129, 0.1)',
     color: '#10b981',
@@ -267,13 +238,11 @@ const styles = {
     borderRadius: '9999px',
     fontSize: '0.75rem'
   },
-
   price: {
     color: '#f59e0b',
     fontWeight: 'bold',
     fontSize: '1.2rem'
   },
-
   buttonMain: {
     width: '100%',
     backgroundColor: '#10b981',
