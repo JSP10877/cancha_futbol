@@ -62,9 +62,18 @@ export default function MiPerfil() {
     return diferenciaHoras > 0 && diferenciaHoras <= 12;
   });
 
+
+
   const manejarSubmit = (e) => {
     e.preventDefault();
     setMensaje("");
+
+    const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!correoValido.test(form.correo)) {
+      setMensaje("❌ Por favor ingresa un correo válido");
+      return;
+    }
 
     if (esLogin) {
       const res = login({
@@ -72,15 +81,24 @@ export default function MiPerfil() {
         password: form.password
       });
 
-      if (!res.ok) return setMensaje(res.msg);
+      if (!res.ok) {
+        setMensaje(res.msg);
+        return;
+      }
+
       setMensaje("✅ Sesión iniciada");
     } else {
       const res = register(form);
 
-      if (!res.ok) return setMensaje(res.msg);
+      if (!res.ok) {
+        setMensaje(res.msg);
+        return;
+      }
+
       setMensaje("✅ Cuenta creada");
     }
   };
+
 
   const handleUpdate = () => {
     updateUser(form);
@@ -116,7 +134,7 @@ export default function MiPerfil() {
       <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm" />
 
       <div className="relative z-10">
-        <Navbar paginaActiva="perfil" />
+        <Navbar paginaActiva="miperfil" />
 
         <div className="max-w-6xl mx-auto p-6">
 
@@ -145,9 +163,16 @@ export default function MiPerfil() {
                 )}
 
                 <input
+                  type="email"
                   placeholder="Correo"
-                  onChange={e => setForm({ ...form, correo: e.target.value })}
-                  className="w-full p-3 rounded-xl bg-white/10 border border-white/20"
+                  value={form.correo}
+                  onChange={(e) => setForm({ ...form, correo: e.target.value })}
+                  className={`w-full p-3 rounded-xl bg-white/10 border ${
+                    mensaje.includes("correo")
+                      ? "border-red-500"
+                      : "border-white/20"
+                  }`}
+                  required
                 />
 
                 <input
@@ -215,7 +240,7 @@ export default function MiPerfil() {
 
               {/* TABS */}
               <div className="flex gap-3 bg-white/5 backdrop-blur p-2 rounded-full w-fit border border-white/10">
-                {["perfil", "reservas", "wallet"].map(t => (
+                {["perfil", "reservas", "Billetera"].map(t => (
                   <button
                     key={t}
                     onClick={() => setTab(t)}
@@ -355,8 +380,8 @@ export default function MiPerfil() {
                 </div>
               )}
 
-              {/* WALLET */}
-              {tab === "wallet" && (
+              {/* Billetera */}
+              {tab === "Billetera" && (
                               <div className="relative overflow-hidden rounded-3xl shadow-2xl">
 
                                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-green-700 to-slate-900" />
@@ -370,7 +395,7 @@ export default function MiPerfil() {
                                       </p>
 
                                       <h2 className="text-6xl font-bold mt-3">
-                                        ${user.wallet || 0}
+                                        ${user.Billetera || 0}
                                       </h2>
                                     </div>
 
@@ -417,7 +442,11 @@ export default function MiPerfil() {
                             )}
 
               {mensaje && (
-                <p className="text-center text-green-400">
+                <p className={`text-center mt-4 font-medium ${
+                  mensaje.includes("❌")
+                    ? "text-red-400"
+                    : "text-green-400"
+                }`}>
                   {mensaje}
                 </p>
               )}

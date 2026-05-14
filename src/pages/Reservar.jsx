@@ -8,6 +8,8 @@ import canchasfutbol from "../assets/images/futbol.jpg";
 import canchaspadel from "../assets/images/padel.jpg";
 import canchasvoleibol1 from "../assets/images/canchavoleibol.jpg";
 import canchasvoleibol2 from "../assets/images/canchapisovoleibol.jpg";
+import canchasbasket from '../assets/images/canchabasket.jpg';
+import canchastenis from '../assets/images/canchatenis.jpg';
 
 const infoCanchas = {
   1: { nombre: "Arena 5 Norte", precio: 35000, imagen: canchasfutbol },
@@ -19,6 +21,10 @@ const infoCanchas = {
   7: { nombre: "Voleibol Arena 1", precio: 35000, imagen: canchasvoleibol1 },
   8: { nombre: "Voleibol Piso", precio: 35000, imagen: canchasvoleibol2 },
   9: { nombre: "Voleibol Arena 2", precio: 30000, imagen: canchasvoleibol1 },
+  10: {nombre: "Tenis Court 1", precio: 40000, imagen: canchastenis },
+  11: { nombre: "Tenis Court 2", precio: 42000, imagen: canchastenis },
+  12: { nombre: "Basket Arena 1", precio: 38000, imagen: canchasbasket},
+  13: { nombre: "Basket Arena 2", precio: 40000, imagen: canchasbasket },
 };
 
 export default function Reservar() {
@@ -31,8 +37,11 @@ export default function Reservar() {
 
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
-  const [duracionReserva, setDuracionReserva] = useState(2);
-  const [mensaje, setMensaje] = useState("");
+  const [duracionReserva, setDuracionReserva] = useState(1);
+  const [toast, setToast] = useState({
+    show: false,
+    text: "",
+  });
   const [mensajeHorario, setMensajeHorario] = useState("");
 
   if (!cancha) return <p className="text-white p-6">Cancha no encontrada</p>;
@@ -103,7 +112,14 @@ export default function Reservar() {
     if (!user) return;
 
     if (!fecha || !hora) {
-      setMensaje("Selecciona fecha y hora");
+      setToast({
+        show: true,
+        text: "Selecciona fecha y hora",
+      });
+
+      setTimeout(() => {
+        setToast({ show: false, text: "" });
+      }, 2500);
       return;
     }
 
@@ -122,9 +138,14 @@ export default function Reservar() {
       JSON.stringify([...reservasGuardadas, nuevaReserva])
     );
 
-    setMensaje("✅ Reserva realizada con éxito");
+    setToast({
+      show: true,
+      text: "Reserva confirmada. Revísala en tu perfil.",
+    });
 
-    setTimeout(() => navigate("/canchas"), 1800);
+    setTimeout(() => {
+      navigate("/miperfil");
+    }, 2500);
   };
 
   return (
@@ -175,7 +196,7 @@ export default function Reservar() {
                   onChange={(e) => {
                     setFecha(e.target.value);
                     setHora("");
-                    setMensaje("");
+                    setToast({ show: false, text: "" });
                   }}
                   className="absolute inset-0 opacity-0 cursor-pointer"
                 />
@@ -217,7 +238,7 @@ export default function Reservar() {
                 </label>
 
                 <div className="flex gap-3 flex-wrap">
-                  {[2, 3, 4, 5, 6].map((d) => (
+                  {[1, 2, 3, 4, 5, 6].map((d) => (
                     <button
                       key={d}
                       onClick={() => {
@@ -230,7 +251,7 @@ export default function Reservar() {
                           : "bg-white/10 hover:bg-white/20"
                       }`}
                     >
-                      {d} horas
+                      {d} {d === 1 ? "hora" : "horas"}
                     </button>
                   ))}
                 </div>
@@ -335,7 +356,7 @@ export default function Reservar() {
                 </p>
 
                 <p className="text-slate-300 mt-2">
-                  {cancha.precio.toLocaleString()} x {duracionReserva} horas
+                  ${cancha.precio.toLocaleString()} x {duracionReserva} horas
                 </p>
 
                 <p className="text-yellow-400 font-bold mt-3 text-xl">
@@ -347,13 +368,34 @@ export default function Reservar() {
             {hora && (
               <button
                 onClick={guardarReserva}
-                className="mt-6 w-full bg-green-500 hover:bg-green-600 py-4 rounded-2xl font-bold text-lg"
+                className="mt-6 w-full bg-green-500 hover:bg-green-600 py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:scale-[1.02] shadow-lg hover:shadow-green-500/30"
               >
                 Confirmar reserva
               </button>
             )}
           </div>
         </div>
+
+        {/* TOAST VISUAL */}
+        {toast.show && (
+          <div className="fixed top-24 right-6 z-[9999] animate-[fadeIn_.4s_ease]">
+            <div className="bg-slate-900/95 backdrop-blur-xl border border-green-500/40 shadow-2xl rounded-2xl px-6 py-5 flex items-center gap-4 min-w-[340px]">
+
+              <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-xl font-bold">
+                ✓
+              </div>
+
+              <div>
+                <h4 className="font-bold text-green-400 text-lg">
+                  Reserva exitosa
+                </h4>
+                <p className="text-slate-300 text-sm">
+                  {toast.text}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {!user && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50">
@@ -364,7 +406,7 @@ export default function Reservar() {
 
               <Link
                 to="/miperfil"
-                className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-2xl font-bold"
+                className="bg-green-500 hover:bg-green-600 px-8 py-3 rounded-2xl font-bold transition"
               >
                 Iniciar sesión
               </Link>

@@ -8,17 +8,27 @@ import canchasfutbol from '../assets/images/futbol.jpg';
 import canchaspadel from '../assets/images/padel.jpg';
 import canchasvoleibol1 from '../assets/images/canchavoleibol.jpg';
 import canchasvoleibol2 from '../assets/images/canchapisovoleibol.jpg';
+import canchasbasket from '../assets/images/canchabasket.jpg';
+import canchastenis from '../assets/images/canchatenis.jpg';
 
 const canchasData = [
   { id: 1, nombre: "Arena 5 Norte", desc: "Césped sintético FIFA Quality Pro con iluminación LED profesional", precio: 35000, tipo: "Sintético", imagen: canchasfutbol },
   { id: 2, nombre: "Arena 5 Sur", desc: "Cancha techada con graderías y vestuarios completos", precio: 45000, tipo: "Sintético", imagen: canchasfutbol },
   { id: 3, nombre: "Estadio Urbano", desc: "Césped natural premium con sistema de drenaje", precio: 48000, tipo: "Natural", imagen: canchasfutbol },
+
   { id: 4, nombre: "Padel Cancha 1", desc: "Ideal para partidos rápidos y torneos empresariales", precio: 25000, tipo: "Piso", imagen: canchaspadel },
   { id: 5, nombre: "Padel Cancha 2", desc: "Iluminación nocturna HD y marcador electrónico", precio: 25000, tipo: "Piso", imagen: canchaspadel },
   { id: 6, nombre: "Padel Cancha 3", desc: "Ambiente recreativo con zona de comidas", precio: 30000, tipo: "Piso", imagen: canchaspadel },
-  { id: 7, nombre: "Voleibol Arena 1", desc: "Ambiente familiar con arta arena para partidos prolongados", precio: 35000, tipo: "Arena", imagen: canchasvoleibol1 },
-  { id: 8, nombre: "Voleibol Piso", desc: "Cancha con arta arena para partidos prolongados con marcador electrónico", precio: 35000, tipo: "Piso", imagen: canchasvoleibol2 },
-  { id: 9, nombre: "Voleibol Arena 2", desc: "Cancha con arta arena para partidos amistosos", precio: 30000, tipo: "Arena", imagen: canchasvoleibol1 },
+
+  { id: 7, nombre: "Voleibol Arena 1", desc: "Espacio ideal para partidos recreativos sobre arena profesional", precio: 35000, tipo: "Arena", imagen: canchasvoleibol1 },
+  { id: 8, nombre: "Voleibol Piso", desc: "Cancha indoor con marcador electrónico", precio: 35000, tipo: "Piso", imagen: canchasvoleibol2 },
+  { id: 9, nombre: "Voleibol Arena 2", desc: "Perfecta para encuentros amistosos", precio: 30000, tipo: "Arena", imagen: canchasvoleibol1 },
+
+  { id: 10, nombre: "Tenis Court 1", desc: "Cancha profesional de superficie rápida con iluminación LED", precio: 32000, tipo: "Piso", imagen: canchastenis },
+  { id: 11, nombre: "Tenis Court 2", desc: "Espacio premium para entrenamiento y competición", precio: 35000, tipo: "Piso", imagen: canchastenis },
+
+  { id: 12, nombre: "Basket Arena 1", desc: "Cancha full court con tablero profesional", precio: 28000, tipo: "Piso", imagen: canchasbasket },
+  { id: 13, nombre: "Basket Arena 2", desc: "Iluminación HD y gradería lateral", precio: 30000, tipo: "Piso", imagen: canchasbasket },
 ];
 
 const TarjetaCancha = ({ cancha, onOpen }) => (
@@ -82,7 +92,7 @@ export default function Canchas() {
 
   return (
     <div style={styles.mainWrapper}>
-      <Navbar />
+      <Navbar paginaActiva="canchas" />
 
       <section style={styles.heroSection}>
         <div style={styles.heroContainer}>
@@ -162,8 +172,8 @@ const styles = {
   },
 
   heroSection: {
-    backgroundColor: '#2f3745',
-    padding: '80px 20px',
+    background: 'linear-gradient(to bottom, #020617, #111827)',
+    padding: '120px 20px 80px',
     borderBottom: '1px solid #1e293b'
   },
 
