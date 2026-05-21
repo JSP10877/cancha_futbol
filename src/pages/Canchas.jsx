@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import DetalleCanchaModal from './DetalleCanchaModal';
 import Footer from '../components/Footer';
@@ -13,19 +14,19 @@ import canchastenis from '../assets/images/canchatenis.jpg';
 import logotipo from '../assets/images/logotipo.png';
 
 const canchasData = [
-  { id: 1, nombre: "Arena 5 Norte", desc: "Césped sintético FIFA Quality Pro con iluminación LED profesional", precio: 35000, tipo: "Sintético", imagen: canchasfutbol },
-  { id: 2, nombre: "Arena 5 Sur", desc: "Cancha techada con graderías y vestuarios completos", precio: 45000, tipo: "Sintético", imagen: canchasfutbol },
-  { id: 3, nombre: "Estadio Urbano", desc: "Césped natural premium con sistema de drenaje", precio: 48000, tipo: "Natural", imagen: canchasfutbol },
-  { id: 4, nombre: "Padel Cancha 1", desc: "Ideal para partidos rápidos y torneos empresariales", precio: 25000, tipo: "Piso", imagen: canchaspadel },
-  { id: 5, nombre: "Padel Cancha 2", desc: "Iluminación nocturna HD y marcador electrónico", precio: 25000, tipo: "Piso", imagen: canchaspadel },
-  { id: 6, nombre: "Padel Cancha 3", desc: "Ambiente recreativo con zona de comidas", precio: 30000, tipo: "Piso", imagen: canchaspadel },
+  { id: 1, nombre: "Fútbol arena 5 Norte", desc: "Césped sintético FIFA Quality Pro con iluminación LED profesional", precio: 35000, tipo: "Sintético", imagen: canchasfutbol },
+  { id: 2, nombre: "Fútbol arena 5 Sur", desc: "Cancha techada con graderías y vestuarios completos", precio: 45000, tipo: "Sintético", imagen: canchasfutbol },
+  { id: 3, nombre: "Fútbol estadio urbano", desc: "Césped natural premium con sistema de drenaje", precio: 48000, tipo: "Natural", imagen: canchasfutbol },
+  { id: 4, nombre: "Pádel Cancha 1", desc: "Ideal para partidos rápidos y torneos empresariales", precio: 25000, tipo: "Piso", imagen: canchaspadel },
+  { id: 5, nombre: "Pádel Cancha 2", desc: "Iluminación nocturna HD y marcador electrónico", precio: 25000, tipo: "Piso", imagen: canchaspadel },
+  { id: 6, nombre: "Pádel Cancha 3", desc: "Ambiente recreativo con zona de comidas", precio: 30000, tipo: "Piso", imagen: canchaspadel },
   { id: 7, nombre: "Voleibol Arena 1", desc: "Espacio ideal para partidos recreativos sobre arena profesional", precio: 35000, tipo: "Arena", imagen: canchasvoleibol1 },
   { id: 8, nombre: "Voleibol Piso", desc: "Cancha indoor con marcador electrónico", precio: 35000, tipo: "Piso", imagen: canchasvoleibol2 },
   { id: 9, nombre: "Voleibol Arena 2", desc: "Perfecta para encuentros amistosos", precio: 30000, tipo: "Arena", imagen: canchasvoleibol1 },
   { id: 10, nombre: "Tenis Court 1", desc: "Cancha profesional de superficie rápida con iluminación LED", precio: 32000, tipo: "Piso", imagen: canchastenis },
   { id: 11, nombre: "Tenis Court 2", desc: "Espacio premium para entrenamiento y competición", precio: 35000, tipo: "Piso", imagen: canchastenis },
-  { id: 12, nombre: "Basket Arena 1", desc: "Cancha full court con tablero profesional", precio: 28000, tipo: "Piso", imagen: canchasbasket },
-  { id: 13, nombre: "Basket Arena 2", desc: "Iluminación HD y gradería lateral", precio: 30000, tipo: "Piso", imagen: canchasbasket },
+  { id: 12, nombre: "Basketball Arena 1", desc: "Cancha full court con tablero profesional", precio: 28000, tipo: "Piso", imagen: canchasbasket },
+  { id: 13, nombre: "Basketball Arena 2", desc: "Iluminación HD y gradería lateral", precio: 30000, tipo: "Piso", imagen: canchasbasket },
 ];
 
 const TarjetaCancha = ({ cancha, onOpen }) => (
@@ -55,10 +56,18 @@ const TarjetaCancha = ({ cancha, onOpen }) => (
 );
 
 export default function Canchas() {
+  const [searchParams] = useSearchParams();
   const [selectedId, setSelectedId] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [tipoFiltro, setTipoFiltro] = useState("Todos");
   const [ordenPrecio, setOrdenPrecio] = useState("default");
+
+  useEffect(() => {
+    const deporteParam = searchParams.get('deporte');
+    if (deporteParam) {
+      setBusqueda(deporteParam);
+    }
+  }, [searchParams]);
 
   const canchasFiltradas = useMemo(() => {
     let resultado = [...canchasData];

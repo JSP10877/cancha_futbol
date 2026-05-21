@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';  // ← Agregar esto
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -28,7 +29,7 @@ const eventos = [
 
 const espacios = [
   {
-    nombre: "Fútbol 5",
+    nombre: "Fútbol",
     img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1400",
   },
   {
@@ -40,7 +41,7 @@ const espacios = [
     img: "https://images.unsplash.com/photo-1592656094267-764a45160876?q=80&w=1400",
   },
   {
-    nombre: "Basketbol",
+    nombre: "Basketball",
     img: "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=1400",
   },
   {
@@ -49,10 +50,9 @@ const espacios = [
   },
 ];
 
-
 export default function Home() {
   const [eventoActual, setEventoActual] = useState(0);
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     const i = setInterval(() => {
@@ -96,7 +96,7 @@ export default function Home() {
 
 
         {/* NUESTROS ESPACIOS */}
-        <section className="py-28 bg-[#06110c]">
+        <section className="py-12 bg-[#06110c]">
           <div className="container mx-auto px-6">
 
             <div className="text-center mb-14">
@@ -118,6 +118,7 @@ export default function Home() {
               {espacios.map((e) => (
                 <div
                   key={e.nombre}
+                  onClick={() => navigate(`/canchas?deporte=${e.nombre}`)}
                   className="relative group rounded-3xl overflow-hidden h-[380px] cursor-pointer"
                 >
                   <img
@@ -155,7 +156,7 @@ export default function Home() {
 
 
         {/* SERVICIOS */}
-        <section className="py-24 bg-[#07140f]">
+        <section className="py-12 bg-[#07140f]">
           <div className="container mx-auto px-6">
 
             <div className="mb-14">
@@ -240,12 +241,8 @@ export default function Home() {
 
 
 
-
-
-
-
         {/* 🎯 EVENTOS SLIDESHOW (más integrado visualmente) */}
-        <section className="py-28 bg-[#06110c]">
+        <section className="py-12 bg-[#06110c]">
 
           <div className="container mx-auto px-6">
 
@@ -330,8 +327,10 @@ export default function Home() {
           </div>
         </section>
 
+
+
         {/* INFO (rediseñada tipo panel SaaS deportivo) */}
-        <section className="py-24 bg-[#07140f]">
+        <section className="py-12 bg-[#07140f]">
           <div className="container mx-auto px-6">
 
             <div className="mb-12 text-center">
