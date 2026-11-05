@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import fondo from "../assets/images/futbol.jpg";
@@ -12,38 +12,21 @@ export default function MiPerfil() {
   const [mensaje, setMensaje] = useState("");
   const [reservaAbierta, setReservaAbierta] = useState(null);
 
-  const [form, setForm] = useState({
-    nombre: "",
-    nickname: "",
-    correo: "",
-    telefono: "",
-    direccion: "",
-    ciudad: "",
-    nacimiento: "",
+// Estado único del formulario
+const [form, setForm] = useState({
+    nombre: user?.nombre || "",
+    nickname: user?.nickname || "",
+    correo: user?.correo || "",
+    telefono: user?.telefono || "",
+    direccion: user?.direccion || "",
+    ciudad: user?.ciudad || "",
+    nacimiento: user?.nacimiento ? user.nacimiento.split('T')[0] : "",
     password: ""
   });
-
-  const [reservas, setReservas] = useState([]);
-
-  useEffect(() => {
-    const guardadas = JSON.parse(localStorage.getItem("reservas")) || [];
-    setReservas(guardadas);
-  }, []);
-
-  useEffect(() => {
-    if (user) {
-      setForm({
-        nombre: user.nombre || "",
-        nickname: user.nickname || "",
-        correo: user.correo || "",
-        telefono: user.telefono || "",
-        direccion: user.direccion || "",
-        ciudad: user.ciudad || "",
-        nacimiento: user.nacimiento || "",
-        password: ""
-      });
-    }
-  }, [user]);
+  
+  const [reservas, setReservas] = useState(() => {
+    return JSON.parse(localStorage.getItem("reservas")) || [];
+  });
 
   const hoy = new Date().toISOString().split("T")[0];
 
@@ -168,13 +151,11 @@ export default function MiPerfil() {
                   value={form.correo}
                   onChange={(e) => setForm({ ...form, correo: e.target.value })}
                   className={`w-full p-3 rounded-xl bg-white/10 border ${
-                    mensaje.includes("correo")
-                      ? "border-red-500"
-                      : "border-white/20"
-                  }`}
-                  required
+                  mensaje?.includes("correo") ? "border-red-500" : "border-white/20"
+              }`}
+            required
                 />
-
+               
                 <input
                   type="password"
                   placeholder="Contraseña"
@@ -384,7 +365,7 @@ export default function MiPerfil() {
               {tab === "Billetera" && (
                               <div className="relative overflow-hidden rounded-3xl shadow-2xl">
 
-                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-green-700 to-slate-900" />
+                                <div className="absolute inset-0 bg-linear-to-br from-emerald-600 via-green-700 to-slate-900" />
 
                                 <div className="relative z-10 p-10">
 

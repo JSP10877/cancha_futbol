@@ -96,7 +96,7 @@ export default function Home() {
 
 
         {/* NUESTROS ESPACIOS */}
-        <section className="py-12 bg-[#06110c]">
+        <section className="py-10 bg-[#06110c]">
           <div className="container mx-auto px-6">
 
             <div className="text-center mb-14">
@@ -156,7 +156,7 @@ export default function Home() {
 
 
         {/* SERVICIOS */}
-        <section className="py-12 bg-[#07140f]">
+        <section className="py-10 bg-[#07140f]">
           <div className="container mx-auto px-6">
 
             <div className="mb-14">
@@ -242,7 +242,7 @@ export default function Home() {
 
 
         {/* 🎯 EVENTOS SLIDESHOW (más integrado visualmente) */}
-        <section className="py-12 bg-[#06110c]">
+        <section className="py-10 bg-[#06110c]">
 
           <div className="container mx-auto px-6">
 
@@ -330,7 +330,7 @@ export default function Home() {
 
 
         {/* INFO (rediseñada tipo panel SaaS deportivo) */}
-        <section className="py-12 bg-[#07140f]">
+        <section className="py-10 bg-[#07140f]">
           <div className="container mx-auto px-6">
 
             <div className="mb-12 text-center">

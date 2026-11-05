@@ -1,93 +1,99 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
+  // Ñamoñepyrũ ko'ápe pe estado ojehecha haguã localStorage-pe peteĩ function rupive
+  const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("userActivo");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   const saveUser = (usuario) => {
-    localStorage.setItem("userActivo", JSON.stringify(usuario));
-    setUser(usuario);
+    const userNormalizado = {
+      ...usuario,
+      Billetera: usuario.billetera !== undefined ? usuario.billetera : (usuario.Billetera || 0)
+    };
+    localStorage.setItem("userActivo", JSON.stringify(userNormalizado));
+    setUser(userNormalizado);
   };
 
   // REGISTRO
-  const register = ({ nombre, correo, telefono, password }) => {
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+  const register = async (formData) => {
+    try {
+      const response = await fetch("http://localhost:4000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+      const data = await response.json();
 
-    const correoLimpio = correo.trim().toLowerCase();
-
-    const existe = usuarios.find(
-      (u) => u.correo.toLowerCase() === correoLimpio
-    );
-
-    if (existe) {
-      return { ok: false, msg: "El correo ya está registrado" };
+      if (data.ok) {
+        saveUser(data.user);
+        return { ok: true };
+      } else {
+        return { ok: false, msg: data.msg };
+      }
+    } catch (error) {
+      console.error("Error en registro:", error);
+      return { ok: false, msg: "❌ No se pudo conectar con el servidor" };
     }
-
-    const nuevoUsuario = {
-      nombre,
-      correo: correoLimpio,
-      telefono,
-      password: password.trim(),
-      wallet: 0
-    };
-
-    localStorage.setItem(
-      "usuarios",
-      JSON.stringify([...usuarios, nuevoUsuario])
-    );
-
-    saveUser(nuevoUsuario);
-
-    return { ok: true };
   };
 
   // LOGIN
-  const login = ({ correo, password }) => {
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+  const login = async ({ correo, password }) => {
+    try {
+      const response = await fetch("http://localhost:4000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo, password })
+      });
+      const data = await response.json();
 
-    const correoLimpio = correo.trim().toLowerCase();
-
-    const encontrado = usuarios.find(
-      (u) =>
-        u.correo.toLowerCase() === correoLimpio &&
-        u.password === password.trim()
-    );
-
-    if (!encontrado) {
-      return { ok: false, msg: "Credenciales incorrectas" };
+      if (data.ok) {
+        saveUser(data.user);
+        return { ok: true };
+      } else {
+        return { ok: false, msg: data.msg };
+      }
+    } catch (error) {
+      console.error("Error en login:", error);
+      return { ok: false, msg: "❌ No se pudo conectar con el servidor" };
     }
-
-    saveUser(encontrado);
-    return { ok: true };
   };
 
   // ACTUALIZAR PERFIL
-  const updateUser = (data) => {
-    const usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+  const updateUser = async (dataForm) => {
+    if (!user || !user.id) {
+      return { ok: false, msg: "Usuario no autenticado" };
+    }
 
-    const nuevosUsuarios = usuarios.map((u) =>
-      u.correo === user.correo ? { ...u, ...data } : u
-    );
+    try {
+      const response = await fetch(`http://localhost:4000/api/usuarios/${user.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataForm)
+      });
+      const data = await response.json();
 
-    localStorage.setItem("usuarios", JSON.stringify(nuevosUsuarios));
-
-    const actualizado = { ...user, ...data };
-    saveUser(actualizado);
+      if (data.ok) {
+        saveUser(data.user);
+        return { ok: true };
+      } else {
+        return { ok: false, msg: data.msg };
+      }
+    } catch (error) {
+      console.error("Error al actualizar:", error);
+      return { ok: false, msg: "❌ Error de conexión al actualizar" };
+    }
   };
 
-  const addBalance = (amount) => {
-    const nuevoSaldo = (user.wallet || 0) + amount;
-    updateUser({ wallet: nuevoSaldo });
+  const addBalance = async (amount) => {
+    const saldoActual = user.Billetera || 0;
+    const nuevoSaldo = saldoActual + amount;
+    await updateUser({ ...user, billetera: nuevoSaldo });
   };
 
   const logout = () => {
